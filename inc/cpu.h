@@ -23,16 +23,6 @@ typedef struct
     size_t   data_size;             /*Data memory size*/
 } cpu_t;
 
-typedef struct
-{
-    int opcode;
-    int src_reg1;
-    int src_reg2;
-    int imm_swt;
-    int imm_val;
-    int dst_reg;
-} operand_t;
-
 enum decode_type_e
 {
     TYP0,
@@ -41,6 +31,19 @@ enum decode_type_e
     TYP3,
     TYP4
 };
+
+typedef struct
+{
+    enum decode_type_e type;
+    int opcode;
+    int src_reg1;
+    int src_reg2;
+    int imm_swt;
+    int imm_val;
+    int dst_reg;
+} operand_t;
+
+
 
 /*Instruction set*/
 void _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s);

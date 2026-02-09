@@ -135,7 +135,7 @@ void _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
         scanf("%d", &cpu_s->regs[1]);
         break;
     case 1:
-        printf("[SCALL] R1 value: %.8x\n", cpu_s->regs[1]);
+        printf("[SCALL] R1 value: %d (0x%.8x)\n", cpu_s->regs[1], cpu_s->regs[1]);
         break;
     case 3:
         printf("[SCALL] R1 value (char): %c\n", (char)cpu_s->regs[1]);
@@ -159,7 +159,8 @@ void _cpu_fetch(cpu_t* cpu_s){
 
 void _cpu_decode(cpu_t* cpu_s, operand_t* operand_s){
     operand_s->opcode = (int)((cpu_s->ir >> 27) & 0x1F);
-    switch (decoding_type[operand_s->opcode])
+    operand_s->type = decoding_type[operand_s->opcode];
+    switch (operand_s->type)
     {
     case TYP0:
         operand_s->src_reg1 = (int)((cpu_s->ir >> 22) & 0x1F);
@@ -213,24 +214,74 @@ void cpu_step(cpu_t* cpu_s, int verbose_flag){
     _cpu_decode(cpu_s, &operand_s);
 
     if(verbose_flag){
-        printf("Instr: %s s1=%d, s2=%d, imm?=%d, imm=%d, dst=%d\n", 
-            mnemonics[operand_s.opcode], 
-            operand_s.src_reg1, 
-            operand_s.src_reg2, 
-            operand_s.imm_swt, 
-            operand_s.imm_val, 
-            operand_s.dst_reg
-        );
+        switch (operand_s.type)
+        {
+        case TYP0:
+            if(operand_s.imm_swt){
+                printf("Instr: %s r%d, %d, r%d\n", 
+                    mnemonics[operand_s.opcode], 
+                    operand_s.src_reg1, 
+                    operand_s.imm_val, 
+                    operand_s.dst_reg
+                );
+            }
+            else{
+                printf("Instr: %s r%d, r%d, r%d\n", 
+                    mnemonics[operand_s.opcode], 
+                    operand_s.src_reg1, 
+                    operand_s.src_reg2, 
+                    operand_s.dst_reg
+                );
+            }
+            break;
+        case TYP1:
+            if(operand_s.imm_swt){
+                printf("Instr: %s %d, r%d\n", 
+                    mnemonics[operand_s.opcode], 
+                    operand_s.imm_val, 
+                    operand_s.src_reg1
+                );
+            }
+            else{
+                printf("Instr: %s %d, r%d\n", 
+                    mnemonics[operand_s.opcode], 
+                    operand_s.dst_reg, 
+                    operand_s.src_reg1
+                );
+            }
+            break;
+        case TYP2:
+            printf("Instr: %s r%d, %d\n", 
+                mnemonics[operand_s.opcode], 
+                operand_s.src_reg1, 
+                operand_s.imm_val
+            );
+            break;
+        case TYP3:
+            printf("Instr: %s %d\n", 
+                mnemonics[operand_s.opcode], 
+                operand_s.imm_val
+            );
+            break;
+        case TYP4:
+            printf("Instr: %s\n", 
+                mnemonics[operand_s.opcode]
+            );
+        default:
+            break;
+        }
     }
 
     _cpu_execute(cpu_s, &operand_s);   
 
     if(verbose_flag){
         for(int i=0; i<CPU_REG_COUNT; i++){
-            printf("r%d=%d ",i, cpu_s->regs[i]);
+            printf("r%d=%d\t",i, cpu_s->regs[i]);
+            if((i % (CPU_REG_COUNT/4)) == (CPU_REG_COUNT/4)-1){
+                printf("\n");
+            }
         }
-        printf("\n");
-        
+        //printf("\n");
     }
 }
 

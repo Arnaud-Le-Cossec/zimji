@@ -105,5 +105,6 @@ int main(int argc,char ** argv) {
 
     }
     free(cpu_s.prog_mem);
+    free(cpu_s.data_mem);
     return 0;
 }
