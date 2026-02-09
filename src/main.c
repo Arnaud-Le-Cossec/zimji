@@ -19,10 +19,11 @@ int main(int argc,char ** argv) {
     int clock_frequency = 1; //Default 1Hz
 
     cpu_t cpu_s;
-    operand_t operand_s;
+
+    cpu_s.data_size = 32; //Default data memory size : 32 blocks
 
    /*Parse command line options*/
-    while ((opt = getopt(argc, argv, "vsf:")) != -1) {
+    while ((opt = getopt(argc, argv, "vsf:m:")) != -1) {
         switch (opt) {
             case 'v':
                 verbose_flag = 1;
@@ -37,6 +38,13 @@ int main(int argc,char ** argv) {
                     exit(EXIT_FAILURE);
                 }
                 break;
+            case 'm':
+                cpu_s.data_size = strtol(optarg, NULL, 10);
+                if(cpu_s.data_size <= 0){
+                    fprintf(stderr, "Invalid data memory size\n");
+                    exit(EXIT_FAILURE);
+                }
+                break;   
             default:
                 fprintf(stderr, "Usage: %s [-v] [-s] [-f frequency] ROM_file\n", argv[0]);
                 exit(EXIT_FAILURE);
@@ -58,54 +66,33 @@ int main(int argc,char ** argv) {
     }
     printf("%d\n",cpu_s.prog_size);
 
-    /*Allocate memory*/
+    /*Allocate program memory*/
     cpu_s.prog_mem = (uint32_t*)malloc(cpu_s.prog_size*sizeof(uint32_t));
     if(cpu_s.prog_mem == NULL){
         fprintf(stderr, "Error allocating program memory space\n");
         exit(EXIT_FAILURE);
     }
 
+    /*Allocate data memory*/
+    cpu_s.data_mem = (uint32_t*)malloc(cpu_s.data_size*sizeof(uint32_t));
+    if(cpu_s.data_mem == NULL){
+        fprintf(stderr, "Error allocating data memory space\n");
+        exit(EXIT_FAILURE);
+    }
+
     /*Load program into memory*/
     printf("Loaded %zu lines from file %s\n", emu_pseudoBin_Load(argv[optind], cpu_s.prog_mem, cpu_s.prog_size), argv[optind]);
     
+    /*Reset CPU*/
     cpu_reset(&cpu_s);
 
+    /*Set CPU run flag*/
     cpu_s.run_flag = CPU_STATUS_RUN;
 
     /*Emulation loop*/
     while(cpu_s.run_flag == CPU_STATUS_RUN){
 
-        //cpu_step(&cpu_s);
-
-        if(verbose_flag){
-            printf("PC:%d ", cpu_s.pc);
-        }
-
-        _cpu_fetch(&cpu_s);
-
-        _cpu_decode(&cpu_s, &operand_s);
-
-        if(verbose_flag){
-            printf("Instr: %s s1=%d, s2=%d, imm?=%d, imm=%d, dst=%d\n", 
-                mnemonics[operand_s.opcode], 
-                operand_s.src_reg1, 
-                operand_s.src_reg2, 
-                operand_s.imm_swt, 
-                operand_s.imm_val, 
-                operand_s.dst_reg
-            );
-        }
-
-        _cpu_execute(&cpu_s, &operand_s);   
-
-        if(verbose_flag){
-            //cdump cpu state
-            for(int i=0; i<CPU_REG_COUNT; i++){
-                printf("r%d=%d ",i, cpu_s.regs[i]);
-            }
-            printf("\n");
-            
-        }
+        cpu_step(&cpu_s, verbose_flag);
 
         if(step_mode){
             printf("Press ENTER to execute next instruction...\n");

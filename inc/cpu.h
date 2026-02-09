@@ -139,7 +139,7 @@ void _cpu_decode(cpu_t* cpu_s, operand_t* operand_s);
 
 void _cpu_execute(cpu_t* cpu_s, operand_t* operand_s);
 
-void cpu_step();
+void cpu_step(cpu_t* cpu_s, int verbose_flag);
 
 void cpu_reset(cpu_t* cpu_s);
 

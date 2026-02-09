@@ -200,15 +200,38 @@ void _cpu_execute(cpu_t* cpu_s, operand_t* operand_s){
     instruction_set[operand_s->opcode](cpu_s, operand_s);
 }
 
-void cpu_step(cpu_t* cpu_s){
+void cpu_step(cpu_t* cpu_s, int verbose_flag){
 
     operand_t operand_s;
+
+    if(verbose_flag){
+        printf("PC:%d ", cpu_s->pc);
+    }
 
     _cpu_fetch(cpu_s);
 
     _cpu_decode(cpu_s, &operand_s);
 
-    _cpu_execute(cpu_s, &operand_s);
+    if(verbose_flag){
+        printf("Instr: %s s1=%d, s2=%d, imm?=%d, imm=%d, dst=%d\n", 
+            mnemonics[operand_s.opcode], 
+            operand_s.src_reg1, 
+            operand_s.src_reg2, 
+            operand_s.imm_swt, 
+            operand_s.imm_val, 
+            operand_s.dst_reg
+        );
+    }
+
+    _cpu_execute(cpu_s, &operand_s);   
+
+    if(verbose_flag){
+        for(int i=0; i<CPU_REG_COUNT; i++){
+            printf("r%d=%d ",i, cpu_s->regs[i]);
+        }
+        printf("\n");
+        
+    }
 }
 
 void cpu_reset(cpu_t* cpu_s){
