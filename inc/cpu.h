@@ -10,6 +10,15 @@
 #define CPU_STATUS_STOP 0
 #define CPU_STATUS_RUN 1
 
+#define CPU_CLKCYCL_ALU_OP 1
+#define CPU_CLKCYCL_TEST 1
+#define CPU_CLKCYCL_RAM_ACS 3
+#define CPU_CLKCYCL_CACHE_ACS 2
+#define CPU_CLKCYCL_JMP 1
+#define CPU_CLKCYCL_BRANCH_PASS 1
+#define CPU_CLKCYCL_BRANCH_JMP 2
+#define CPU_CLKCYCL_SCALL 5
+
 /*CPU data structure*/
 typedef struct
 {   
@@ -46,28 +55,28 @@ typedef struct
 
 
 /*Instruction set*/
-void _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_add   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_sub   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_mul   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_div   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_and   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_or    (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_xor   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_shl   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_shr   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_slt   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_sle   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_seq   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_load  (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_store (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_jmp   (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_braz  (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_brazn (cpu_t* cpu_s, operand_t* operand_s);
-void _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_add   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_sub   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_mul   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_div   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_and   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_or    (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_xor   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_shl   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_shr   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_slt   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_sle   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_seq   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_load  (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_store (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_jmp   (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_braz  (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_brazn (cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s);
 
 /*Instruction table*/
-typedef void (*instruction_t)(cpu_t* cpu_s, operand_t* operand_s);
+typedef int (*instruction_t)(cpu_t* cpu_s, operand_t* operand_s);
 
 static const instruction_t instruction_set[19] = {
     _cpu_op_stop ,
@@ -140,9 +149,9 @@ void _cpu_fetch(cpu_t* cpu_s);
 
 void _cpu_decode(cpu_t* cpu_s, operand_t* operand_s);
 
-void _cpu_execute(cpu_t* cpu_s, operand_t* operand_s);
+int _cpu_execute(cpu_t* cpu_s, operand_t* operand_s);
 
-void cpu_step(cpu_t* cpu_s, int verbose_flag);
+int cpu_step(cpu_t* cpu_s, int verbose_flag);
 
 void cpu_reset(cpu_t* cpu_s);
 

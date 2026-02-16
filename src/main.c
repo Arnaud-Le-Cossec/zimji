@@ -6,9 +6,6 @@
 #include "cpu.h"
 #include "emulator_utility.h"
 
-
-
-
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -19,7 +16,8 @@ int main(int argc,char ** argv) {
     int step_mode = 0;
     int clock_frequency = 1; //Default 1Hz
 
-    unsigned long steps = 0;
+    unsigned long nb_instr_exec = 0; // Total number of instructions executed
+    unsigned long nb_clk_cycl = 0;   // Total number of clock cycles spent
 
     clock_t run_time, stop_time;
 
@@ -97,9 +95,9 @@ int main(int argc,char ** argv) {
     /*Emulation loop*/
     while(cpu_s.run_flag == CPU_STATUS_RUN){
 
-        cpu_step(&cpu_s, verbose_flag);
+        nb_clk_cycl += cpu_step(&cpu_s, verbose_flag);
 
-        steps ++;
+        nb_instr_exec ++;
 
         if(step_mode){
             printf("Press ENTER to execute next instruction...\n");
@@ -113,7 +111,7 @@ int main(int argc,char ** argv) {
 
     stop_time = clock();
 
-    printf("Executed %ld instructions in %f ms\n", steps , ((float)((stop_time-run_time)*1000)/(float)CLOCKS_PER_SEC));
+    printf("Executed %ld instructions in %ld clock cycles (%f ms)\n", nb_instr_exec, nb_clk_cycl, ((float)((stop_time-run_time)*1000)/(float)CLOCKS_PER_SEC));
 
     free(cpu_s.prog_mem);
     free(cpu_s.data_mem);

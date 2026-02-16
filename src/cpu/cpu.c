@@ -1,112 +1,127 @@
 #include "cpu.h"
 
 
-void _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s){
     cpu_s->run_flag = CPU_STATUS_STOP;
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_add   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_add   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] + operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] + cpu_s->regs[operand_s->src_reg2];
     }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_sub   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_sub   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] - operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] - cpu_s->regs[operand_s->src_reg2];
     }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_mul   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_mul   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] * operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] * cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_div   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_div   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] / operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] / cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_and   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_and   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] & operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] & cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_or    (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_or    (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] | operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] | cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_xor   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_xor   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] ^ operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] ^ cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_shl   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_shl   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] << operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] << cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_shr   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_shr   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] >> operand_s->imm_val;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = cpu_s->regs[operand_s->src_reg1] >> cpu_s->regs[operand_s->src_reg2];
-    } 
+    }
+    return CPU_CLKCYCL_ALU_OP;
 }
-void _cpu_op_slt   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_slt   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] < operand_s->imm_val)? 1:0;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] < cpu_s->regs[operand_s->src_reg2])? 1:0;
-    } 
+    }
+    return CPU_CLKCYCL_TEST;
 }
-void _cpu_op_sle   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_sle   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] <= operand_s->imm_val)? 1:0;
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] <= cpu_s->regs[operand_s->src_reg2])? 1:0;
-    } 
+    }
+    return CPU_CLKCYCL_TEST;
 }
-void _cpu_op_seq   (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_seq   (cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] == operand_s->imm_val);
     }
     else{
         cpu_s->regs[operand_s->dst_reg] = (cpu_s->regs[operand_s->src_reg1] == cpu_s->regs[operand_s->src_reg2]);
-    } 
+    }
+    return CPU_CLKCYCL_TEST;
 }
-void _cpu_op_load(cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_load(cpu_t* cpu_s, operand_t* operand_s){
     cpu_s->regs[operand_s->dst_reg] = cpu_s->data_mem[cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val];
+    return CPU_CLKCYCL_RAM_ACS;
 }
-void _cpu_op_store(cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_store(cpu_t* cpu_s, operand_t* operand_s){
     cpu_s->data_mem[cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val] = cpu_s->regs[operand_s->dst_reg];
+    return CPU_CLKCYCL_RAM_ACS;
 }
-void _cpu_op_jmp(cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_jmp(cpu_t* cpu_s, operand_t* operand_s){
     if(operand_s->imm_swt){
         cpu_s->regs[operand_s->src_reg1] = cpu_s->pc;
         cpu_s->pc = operand_s->imm_val;
@@ -114,23 +129,27 @@ void _cpu_op_jmp(cpu_t* cpu_s, operand_t* operand_s){
     else{
         cpu_s->regs[operand_s->src_reg1] = cpu_s->pc;
         cpu_s->pc = cpu_s->regs[operand_s->dst_reg];
-    } 
+    }
+    return CPU_CLKCYCL_JMP;
 }
-void _cpu_op_braz  (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_braz  (cpu_t* cpu_s, operand_t* operand_s){
     if(cpu_s->regs[operand_s->src_reg1] == 0){
         cpu_s->pc = operand_s->imm_val;
+        return CPU_CLKCYCL_BRANCH_JMP;
     }
+    return CPU_CLKCYCL_BRANCH_PASS;
 }
-void _cpu_op_brazn (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_brazn (cpu_t* cpu_s, operand_t* operand_s){
     if(cpu_s->regs[operand_s->src_reg1] != 0){
         cpu_s->pc = operand_s->imm_val;
+        return CPU_CLKCYCL_BRANCH_JMP;
     }
+    return CPU_CLKCYCL_BRANCH_PASS;
 }
-void _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
+int _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
     switch (operand_s->imm_val)
     {
     case 0:
-        /* code */
         printf("[SCALL] Enter a number:\n");
         scanf("%d", &cpu_s->regs[1]);
         break;
@@ -147,6 +166,7 @@ void _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
         printf("[SCALL] Unknown SCALL function\n");
         break;
     }
+    return CPU_CLKCYCL_SCALL;
 }
 
 /******************************************************************************
@@ -197,13 +217,14 @@ void _cpu_decode(cpu_t* cpu_s, operand_t* operand_s){
     }
 }
 
-void _cpu_execute(cpu_t* cpu_s, operand_t* operand_s){
-    instruction_set[operand_s->opcode](cpu_s, operand_s);
+int _cpu_execute(cpu_t* cpu_s, operand_t* operand_s){
+    return instruction_set[operand_s->opcode](cpu_s, operand_s);
 }
 
-void cpu_step(cpu_t* cpu_s, int verbose_flag){
+int cpu_step(cpu_t* cpu_s, int verbose_flag){
 
     operand_t operand_s;
+    int clockcycles;
 
     if(verbose_flag){
         printf("PC:%d ", cpu_s->pc);
@@ -272,7 +293,7 @@ void cpu_step(cpu_t* cpu_s, int verbose_flag){
         }
     }
 
-    _cpu_execute(cpu_s, &operand_s);   
+    clockcycles = _cpu_execute(cpu_s, &operand_s);   
 
     if(verbose_flag){
         for(int i=0; i<CPU_REG_COUNT; i++){
@@ -285,6 +306,8 @@ void cpu_step(cpu_t* cpu_s, int verbose_flag){
 
     /*Force register 0 to 0*/
     cpu_s->regs[0] = 0;
+
+    return clockcycles;
 }
 
 void cpu_reset(cpu_t* cpu_s){
