@@ -276,13 +276,15 @@ void cpu_step(cpu_t* cpu_s, int verbose_flag){
 
     if(verbose_flag){
         for(int i=0; i<CPU_REG_COUNT; i++){
-            printf("r%d=%d\t",i, cpu_s->regs[i]);
+            printf("r%.2d=0x%.8x\t",i, cpu_s->regs[i]);
             if((i % (CPU_REG_COUNT/4)) == (CPU_REG_COUNT/4)-1){
                 printf("\n");
             }
         }
-        //printf("\n");
     }
+
+    /*Force register 0 to 0*/
+    cpu_s->regs[0] = 0;
 }
 
 void cpu_reset(cpu_t* cpu_s){

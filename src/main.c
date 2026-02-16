@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <time.h>
 #include "cpu.h"
 #include "emulator_utility.h"
 
@@ -18,6 +19,10 @@ int main(int argc,char ** argv) {
     int step_mode = 0;
     int clock_frequency = 1; //Default 1Hz
 
+    unsigned long steps = 0;
+
+    clock_t run_time, stop_time;
+
     cpu_t cpu_s;
 
     cpu_s.data_size = 32; //Default data memory size : 32 blocks
@@ -33,7 +38,7 @@ int main(int argc,char ** argv) {
                 break;
             case 'f':
                 clock_frequency = strtol(optarg, NULL, 10);
-                if(clock_frequency <= 0){
+                if(clock_frequency < 0){
                     fprintf(stderr, "Invalid clock frequency\n");
                     exit(EXIT_FAILURE);
                 }
@@ -64,7 +69,6 @@ int main(int argc,char ** argv) {
         fprintf(stderr, "Error reading binary file\n");
         exit(EXIT_FAILURE);
     }
-    printf("%d\n",cpu_s.prog_size);
 
     /*Allocate program memory*/
     cpu_s.prog_mem = (uint32_t*)malloc(cpu_s.prog_size*sizeof(uint32_t));
@@ -88,22 +92,29 @@ int main(int argc,char ** argv) {
 
     /*Set CPU run flag*/
     cpu_s.run_flag = CPU_STATUS_RUN;
+    run_time = clock();
 
     /*Emulation loop*/
     while(cpu_s.run_flag == CPU_STATUS_RUN){
 
         cpu_step(&cpu_s, verbose_flag);
 
+        steps ++;
+
         if(step_mode){
             printf("Press ENTER to execute next instruction...\n");
             getchar();
         }
-        else{
+        else if(clock_frequency != 0){
             usleep(1000000 / clock_frequency);
         }
 
-
     }
+
+    stop_time = clock();
+
+    printf("Executed %ld instructions in %f ms\n", steps , ((float)((stop_time-run_time)*1000)/(float)CLOCKS_PER_SEC));
+
     free(cpu_s.prog_mem);
     free(cpu_s.data_mem);
     return 0;
