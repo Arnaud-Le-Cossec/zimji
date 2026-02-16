@@ -114,7 +114,10 @@ class InstrMgr():
         if mn in mnemonics:
 
             operand_typ = mnemonics[mn]["typ"]
-            operand_val, operand_imm = self.get_operand(op)
+            if operand_typ != 4:
+                operand_val, operand_imm = self.get_operand(op)
+            else:
+                operand_val, operand_imm = None, [True]
 
             print(f"{mn} (opcode:{mnemonics[mn]["op"]}, typ{operand_typ}), operands:{operand_val} imm:{operand_imm}", end="\n\t")
 
