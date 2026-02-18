@@ -172,6 +172,8 @@ if __name__ == '__main__':
                     continue
                 elif ls[-1] == ':':
                     lblmgr.add(ls.split(':')[0], prgIdx)
+                elif '=' in ls:
+                    lblmgr.add(ls.split('=')[0], int(ls.split('=')[1], 0))
                 else:
                     prgIdx += 1 
             except Exception as err:
@@ -195,6 +197,8 @@ if __name__ == '__main__':
                     if len(ls) == 0:
                         continue
                     elif ls[-1] == ':':
+                        continue
+                    elif '=' in ls:
                         continue
                     else:
 
