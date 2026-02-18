@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #define CPU_REG_COUNT 32
+#define CPU_CACHE_UNIT
 
 #define CPU_STATUS_STOP 0
 #define CPU_STATUS_RUN 1
@@ -18,6 +19,14 @@
 #define CPU_CLKCYCL_BRANCH_PASS 1
 #define CPU_CLKCYCL_BRANCH_JMP 2
 #define CPU_CLKCYCL_SCALL 5
+
+/*Cache block structure*/
+typedef struct
+{
+    int valid_flag;
+    uint32_t tag;
+    uint32_t data[];
+} cache_t;
 
 /*CPU data structure*/
 typedef struct

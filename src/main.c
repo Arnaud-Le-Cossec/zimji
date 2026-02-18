@@ -22,7 +22,6 @@ int main(int argc,char ** argv) {
     clock_t run_time, stop_time;
 
     cpu_t cpu_s;
-
     cpu_s.data_size = 32; //Default data memory size : 32 blocks
 
    /*Parse command line options*/
@@ -49,7 +48,7 @@ int main(int argc,char ** argv) {
                 }
                 break;   
             default:
-                fprintf(stderr, "Usage: %s [-v] [-s] [-f frequency] ROM_file\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-v] [-s] [-f frequency] ROM_file (RAM_file)\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
@@ -58,14 +57,21 @@ int main(int argc,char ** argv) {
                fprintf(stderr, "Expected ROM file path after options\n");
                exit(EXIT_FAILURE);
     }
-    
-    printf("ROM file path argument = %s\n", argv[optind]);
 
     /*Get the number of instructions in ROM file*/
     cpu_s.prog_size = emu_pseudoBin_getSize(argv[optind]);
     if(cpu_s.prog_size == 0){
-        fprintf(stderr, "Error reading binary file\n");
+        fprintf(stderr, "Error reading binary ROM file\n");
         exit(EXIT_FAILURE);
+    }
+
+    /*Get the number of instructions in RAM file (if data file given)*/
+    if(argc = optind+2){  
+        cpu_s.data_size = emu_pseudoBin_getSize(argv[optind+1]);
+        if(cpu_s.prog_size == 0){
+            fprintf(stderr, "Error reading binary RAM file\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     /*Allocate program memory*/
@@ -83,8 +89,13 @@ int main(int argc,char ** argv) {
     }
 
     /*Load program into memory*/
-    printf("Loaded %zu lines from file %s\n", emu_pseudoBin_Load(argv[optind], cpu_s.prog_mem, cpu_s.prog_size), argv[optind]);
+    printf("Loaded %zu lines from ROM file %s\n", emu_pseudoBin_load(argv[optind], cpu_s.prog_mem, cpu_s.prog_size), argv[optind]);
     
+    /*Load data into memory*/
+    if(argc = optind+2){
+        printf("Loaded %zu lines from RAM file %s\n", emu_pseudoBin_load(argv[optind+1], cpu_s.data_mem, cpu_s.data_size), argv[optind]);
+    }
+
     /*Reset CPU*/
     cpu_reset(&cpu_s);
 
@@ -100,8 +111,9 @@ int main(int argc,char ** argv) {
         nb_instr_exec ++;
 
         if(step_mode){
-            printf("Press ENTER to execute next instruction...\n");
-            getchar();
+            /*Start memory monitor. Blocks execution until user input*/
+            printf("Press [newline] to execute next instruction. [h] for memory monitor commands \n");
+            emu_memMonitor_cli(cpu_s.data_mem, cpu_s.data_size);
         }
         else if(clock_frequency != 0){
             usleep(1000000 / clock_frequency);
