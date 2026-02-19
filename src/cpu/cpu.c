@@ -1,5 +1,8 @@
 #include "cpu.h"
 
+/******************************************************************************
+ * Instruction set
+ *****************************************************************************/
 
 int _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s){
     cpu_s->run_flag = CPU_STATUS_STOP;
@@ -114,11 +117,22 @@ int _cpu_op_seq   (cpu_t* cpu_s, operand_t* operand_s){
     return CPU_CLKCYCL_TEST;
 }
 int _cpu_op_load(cpu_t* cpu_s, operand_t* operand_s){
+    if(cpu_s->cache_ena_flag){
+        if (_cpu_cache_read(cpu_s, cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val, &cpu_s->regs[operand_s->dst_reg]) == CPU_CACHE_HIT){
+            return CPU_CLKCYCL_CACHE_ACS;
+        }
+    }
     cpu_s->regs[operand_s->dst_reg] = cpu_s->data_mem[cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val];
+    if(cpu_s->cache_ena_flag){
+        _cpu_cache_write(cpu_s, cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val);
+    }
     return CPU_CLKCYCL_RAM_ACS;
 }
 int _cpu_op_store(cpu_t* cpu_s, operand_t* operand_s){
     cpu_s->data_mem[cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val] = cpu_s->regs[operand_s->dst_reg];
+    if(cpu_s->cache_ena_flag){
+        _cpu_cache_write(cpu_s, cpu_s->regs[operand_s->src_reg1]+operand_s->imm_val);
+    }
     return CPU_CLKCYCL_RAM_ACS;
 }
 int _cpu_op_jmp(cpu_t* cpu_s, operand_t* operand_s){
@@ -168,6 +182,44 @@ int _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
     }
     return CPU_CLKCYCL_SCALL;
 }
+
+/******************************************************************************
+ * Cache
+ *****************************************************************************/
+
+void _cpu_cache_init(cpu_t* cpu_s){
+    int block_idx;
+    for(block_idx=0; block_idx<CPU_CACHE_BLOCK_COUNT; block_idx++){
+        cpu_s->cache_s[block_idx].valid_flag=CPU_CACHE_BLOCK_INVALID;
+    }
+}
+
+int _cpu_cache_read(cpu_t* cpu_s, uint32_t address, uint32_t* data){
+    uint32_t tag = (address>>CPU_CACHE_ADDRSLICE_TAG_BIT);
+    uint32_t block_idx = (uint32_t)(CPU_CACHE_BLOCK_COUNT-1) & (address>>CPU_CACHE_ADDRSLICE_BLOCK_BIT);
+    uint32_t data_idx = address & (uint32_t)(CPU_CACHE_BLOCK_SIZE-1);
+
+    if(cpu_s->cache_s[block_idx].valid_flag == CPU_CACHE_BLOCK_VALID){
+        if(cpu_s->cache_s[block_idx].tag == tag){
+            *data = cpu_s->cache_s[block_idx].data[data_idx];
+            return CPU_CACHE_HIT;
+        }
+    }
+    return CPU_CACHE_MISS;
+}
+
+void _cpu_cache_write(cpu_t* cpu_s, uint32_t address){
+    uint32_t tag = (address>>CPU_CACHE_ADDRSLICE_TAG_BIT);
+    uint32_t block_idx = (uint32_t)(CPU_CACHE_BLOCK_COUNT-1) & (address>>CPU_CACHE_ADDRSLICE_BLOCK_BIT);
+
+    cpu_s->cache_s[block_idx].valid_flag = CPU_CACHE_BLOCK_VALID;
+    cpu_s->cache_s[block_idx].tag = tag;
+    
+    for(uint32_t data_idx=0; data_idx<CPU_CACHE_BLOCK_SIZE; data_idx++){
+        cpu_s->cache_s[block_idx].data[data_idx] = cpu_s->data_mem[(address & ~(uint32_t)(CPU_CACHE_BLOCK_SIZE-1))+data_idx];
+    }
+}
+
 
 /******************************************************************************
  * CPU cycles
@@ -296,9 +348,19 @@ int cpu_step(cpu_t* cpu_s, int verbose_flag){
     clockcycles = _cpu_execute(cpu_s, &operand_s);   
 
     if(verbose_flag){
-        for(int i=0; i<CPU_REG_COUNT; i++){
-            printf("r%.2d=0x%.8x\t",i, cpu_s->regs[i]);
-            if((i % (CPU_REG_COUNT/4)) == (CPU_REG_COUNT/4)-1){
+        for(int reg_idx=0; reg_idx<CPU_REG_COUNT; reg_idx++){
+            printf("r%.2d=0x%.8x\t",reg_idx, cpu_s->regs[reg_idx]);
+            if((reg_idx % (CPU_REG_COUNT/4)) == (CPU_REG_COUNT/4)-1){
+                printf("\n");
+            }
+        }
+
+        if(cpu_s->cache_ena_flag){
+            for(int block_idx=0; block_idx<CPU_CACHE_BLOCK_COUNT; block_idx++){
+                printf("CACHE #%d: Valid=%d, Tag=0x%.8x, Data=", block_idx, cpu_s->cache_s[block_idx].valid_flag, cpu_s->cache_s[block_idx].tag);
+                for(int data_idx=0; data_idx<CPU_CACHE_BLOCK_SIZE; data_idx++){
+                    printf("\t0x%.8x",  cpu_s->cache_s[block_idx].data[data_idx]);
+                }
                 printf("\n");
             }
         }
@@ -317,4 +379,5 @@ void cpu_reset(cpu_t* cpu_s){
     for(int i=0; i<CPU_REG_COUNT; i++){
         cpu_s->regs[i] = 0U;
     }
+    _cpu_cache_init(cpu_s);
 }

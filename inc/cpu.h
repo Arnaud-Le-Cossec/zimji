@@ -6,7 +6,18 @@
 #include <stdio.h>
 
 #define CPU_REG_COUNT 32
-#define CPU_CACHE_UNIT
+
+#define CPU_CACHE_DISABLED 0
+#define CPU_CACHE_ENABLED 1
+#define CPU_CACHE_MISS 0
+#define CPU_CACHE_HIT 1
+#define CPU_CACHE_BLOCK_INVALID 0
+#define CPU_CACHE_BLOCK_VALID 1
+#define CPU_CACHE_BLOCK_COUNT 4 /*Must be a power of 2 and > 0!*/
+#define CPU_CACHE_BLOCK_SIZE 8  /*Must be a power of 2 and > 0!*/
+#define CPU_CACHE_ADDRSLICE_DATA_BIT 0
+#define CPU_CACHE_ADDRSLICE_BLOCK_BIT (CPU_CACHE_ADDRSLICE_DATA_BIT + __builtin_ctzl(CPU_CACHE_BLOCK_SIZE)) //3
+#define CPU_CACHE_ADDRSLICE_TAG_BIT (CPU_CACHE_ADDRSLICE_BLOCK_BIT + __builtin_ctzl(CPU_CACHE_BLOCK_COUNT)) //5
 
 #define CPU_STATUS_STOP 0
 #define CPU_STATUS_RUN 1
@@ -25,22 +36,27 @@ typedef struct
 {
     int valid_flag;
     uint32_t tag;
-    uint32_t data[];
+    uint32_t data[CPU_CACHE_BLOCK_SIZE];
 } cache_t;
 
 /*CPU data structure*/
 typedef struct
 {   
-    int run_flag;
-    uint32_t pc;                    /*Program counter*/
-    uint32_t ir;                    /*Instruction register*/
-    uint32_t regs[CPU_REG_COUNT];   /*Registers*/
-    uint32_t *prog_mem;             /*Program memory space*/
-    uint32_t *data_mem;             /*Data memory space*/
-    size_t   prog_size;             /*Program memory size*/
-    size_t   data_size;             /*Data memory size*/
+    int run_flag;                           /*CPU Run flag = CPU_STATUS_STOP | CPU_STATUS_RUN*/
+    int cache_ena_flag;                     /*CPU Cache enable flag = CPU_CACHE_DISABLED | CPU_CACHE_ENABLED*/
+
+    uint32_t pc;                            /*Program counter*/
+    uint32_t ir;                            /*Instruction register*/
+    uint32_t regs[CPU_REG_COUNT];           /*Registers*/
+    cache_t cache_s[CPU_CACHE_BLOCK_COUNT]; /*Cache*/
+
+    uint32_t *prog_mem;                     /*Program memory space*/
+    uint32_t *data_mem;                     /*Data memory space*/
+    size_t   prog_size;                     /*Program memory size*/
+    size_t   data_size;                     /*Data memory size*/
 } cpu_t;
 
+/*Enumeration for decoding type*/
 enum decode_type_e
 {
     TYP0,
@@ -50,6 +66,7 @@ enum decode_type_e
     TYP4
 };
 
+/*Instruction operand structure*/
 typedef struct
 {
     enum decode_type_e type;
@@ -60,8 +77,6 @@ typedef struct
     int imm_val;
     int dst_reg;
 } operand_t;
-
-
 
 /*Instruction set*/
 int _cpu_op_stop  (cpu_t* cpu_s, operand_t* operand_s);
@@ -154,14 +169,72 @@ static const char* mnemonics[19] = {
     "SCALL"
 };
 
+/******************************************************************************
+ * Cache
+ *****************************************************************************/
+
+/**
+ * @brief Init cache by clearing valid_flag
+ * @param cpu_s CPU structure pointer
+ * @returns None
+ */
+void _cpu_cache_init(cpu_t* cpu_s);
+
+/**
+ * @brief Check if address is in cache
+ * @param cpu_s CPU structure pointer
+ * @param address address tp check
+ * @returns 0=Cache miss, 1=In Cache
+ */
+int _cpu_cache_read(cpu_t* cpu_s, uint32_t address, uint32_t* data);
+
+void _cpu_cache_write(cpu_t* cpu_s, uint32_t address);
+
+/******************************************************************************
+ * CPU cycles
+ *****************************************************************************/
+
+/**
+ * @brief Get instruction from program memory (Prog_mem) into instruction register (IR) and increment program counter (PC)
+ * @param cpu_s CPU structure pointer
+ * @returns None
+ */
 void _cpu_fetch(cpu_t* cpu_s);
 
+/**
+ * @brief Decodes instruction in instruction register (IR) and extract the operands
+ * @param cpu_s CPU structure pointer
+ * @param operand_s Operand structure pointer
+ * @returns None
+ */
 void _cpu_decode(cpu_t* cpu_s, operand_t* operand_s);
 
+/**
+ * @brief Execute the instruction form the operand
+ * @param cpu_s CPU structure pointer
+ * @param operand_s Operand structure pointer
+ * @returns Simulated clock cycles to complete instruction
+ */
 int _cpu_execute(cpu_t* cpu_s, operand_t* operand_s);
 
+
+/******************************************************************************
+ * Public functions
+ *****************************************************************************/
+
+/**
+ * @brief Fetch, decode and execute instruction
+ * @param cpu_s CPU structure pointer
+ * @param verbose_flag Set to one to enable verbose mode
+ * @returns Simulated clock cycles to complete instruction
+ */
 int cpu_step(cpu_t* cpu_s, int verbose_flag);
 
+/**
+ * @brief Reset CPU to initial state
+ * @param cpu_s CPU structure pointer
+ * @returns None
+ */
 void cpu_reset(cpu_t* cpu_s);
 
 

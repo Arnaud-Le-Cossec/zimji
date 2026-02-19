@@ -23,15 +23,19 @@ int main(int argc,char ** argv) {
 
     cpu_t cpu_s;
     cpu_s.data_size = 32; //Default data memory size : 32 blocks
+    cpu_s.cache_ena_flag = CPU_CACHE_DISABLED;
 
    /*Parse command line options*/
-    while ((opt = getopt(argc, argv, "vsf:m:")) != -1) {
+    while ((opt = getopt(argc, argv, "vscf:m:")) != -1) {
         switch (opt) {
             case 'v':
                 verbose_flag = 1;
                 break;
             case 's':
                 step_mode = 1;
+                break;
+            case 'c':
+                cpu_s.cache_ena_flag = CPU_CACHE_ENABLED;
                 break;
             case 'f':
                 clock_frequency = strtol(optarg, NULL, 10);
@@ -48,7 +52,7 @@ int main(int argc,char ** argv) {
                 }
                 break;   
             default:
-                fprintf(stderr, "Usage: %s [-v] [-s] [-f frequency] ROM_file (RAM_file)\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-v] [-s] [-f frequency] [-m RAM size] ROM_file (RAM_file)\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
