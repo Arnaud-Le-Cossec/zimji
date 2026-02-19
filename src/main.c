@@ -14,7 +14,7 @@ int main(int argc,char ** argv) {
     int opt;
     int verbose_flag = 0;
     int step_mode = 0;
-    int clock_frequency = 1; //Default 1Hz
+    unsigned long clock_frequency = 100; //Default 100Hz
 
     unsigned long nb_instr_exec = 0; // Total number of instructions executed
     unsigned long nb_clk_cycl = 0;   // Total number of clock cycles spent
@@ -61,6 +61,13 @@ int main(int argc,char ** argv) {
                fprintf(stderr, "Expected ROM file path after options\n");
                exit(EXIT_FAILURE);
     }
+
+    printf("[%s MODE] [VERBOSE %s] [CPU CACHE %s] [FREQUENCY (CLOCK MODE) %ld Hz]\n", 
+        step_mode?"STEP":"CLOCK", 
+        verbose_flag?"ON":"OFF",
+        (cpu_s.cache_ena_flag==CPU_CACHE_ENABLED)?"ON":"OFF",
+        clock_frequency
+    );
 
     /*Get the number of instructions in ROM file*/
     cpu_s.prog_size = emu_pseudoBin_getSize(argv[optind]);
