@@ -26,8 +26,22 @@ size_t emu_pseudoBin_getSize(char* filename);
  */
 size_t emu_pseudoBin_load(char* filename, uint32_t* memory_ptr, size_t memory_size);
 
+/**
+ * @brief Execute memory monitor in console
+ * @param memory_ptr Memory space pointer
+ * @param memory_size Memory space size
+ * @returns None
+ */
 void emu_memMonitor_cli(uint32_t* memory_ptr, size_t memory_size);
 
+/**
+ * @brief Print memory
+ * @param memory_ptr Memory space pointer
+ * @param memory_size Memory space size
+ * @param start_addr Start address
+ * @param page_size Number of memory blocks to display
+ * @returns None
+ */
 void emu_memMonitor_page(uint32_t* memory_ptr, size_t memory_size, uint32_t start_addr, uint32_t page_size);
 
 #endif // ZIMJI_EMU_H_INCLUDED

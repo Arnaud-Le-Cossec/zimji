@@ -181,13 +181,20 @@ static const char* mnemonics[19] = {
 void _cpu_cache_init(cpu_t* cpu_s);
 
 /**
- * @brief Check if address is in cache
+ * @brief Load data from cache if it is available. If not, update cache and return CPU_CACHE_MISS
  * @param cpu_s CPU structure pointer
- * @param address address tp check
- * @returns 0=Cache miss, 1=In Cache
+ * @param address data address in memory
+ * @param data data pointer
+ * @returns CPU_CACHE_MISS | CPU_CACHE_HIT
  */
 int _cpu_cache_read(cpu_t* cpu_s, uint32_t address, uint32_t* data);
 
+/**
+ * @brief Update cache from memory
+ * @param cpu_s CPU structure pointer
+ * @param address data address in memory
+ * @returns None
+ */
 void _cpu_cache_write(cpu_t* cpu_s, uint32_t address);
 
 /******************************************************************************
