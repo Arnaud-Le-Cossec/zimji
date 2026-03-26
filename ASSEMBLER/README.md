@@ -4,7 +4,7 @@ This program compiles a code written in zimji **assemby** into zimji **machine c
 
 ## Usage
 
-    zimji_asm SOURCE OUTPUT
+    ./zimji_asm SOURCE OUTPUT
 
 - `SOURCE` Path to the assembly source file
 - `OUTPUT` Path to the binary output file (PseudoBin format)
