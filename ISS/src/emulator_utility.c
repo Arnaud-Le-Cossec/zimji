@@ -116,7 +116,7 @@ void emu_memMonitor_cli(uint32_t* memory_ptr, size_t memory_size){
                 continue;
             } 
             if(addr < 0 || addr >= memory_size){
-                printf("Invalid address ! Range: 0x0 - 0x%x)\n", memory_size-1);
+                printf("Invalid address ! Range: 0x0 - 0x%lx)\n", memory_size-1);
                 continue;
             }
 
@@ -158,7 +158,7 @@ void emu_memMonitor_cli(uint32_t* memory_ptr, size_t memory_size){
                 continue;
             }
             if(addr < 0 || addr >= memory_size){
-                printf("Invalid address ! Range: 0x0 - 0x%x)\n", memory_size-1);
+                printf("Invalid address ! Range: 0x0 - 0x%lx)\n", memory_size-1);
                 continue;
             }
 
