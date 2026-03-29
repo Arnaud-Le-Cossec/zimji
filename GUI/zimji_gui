@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+
+import tkinter as tk
+from inc.cpu import Cpu
+from inc.cli import Cli
+from inc.widgets import Widget_CPU_Status
+
+# *****************************************************************************
+# Zimji CPU Emulator interface
+# *****************************************************************************
+
+# *****************************************************************************
+# Gui elements
+# *****************************************************************************
+
+class ZimjiGUI:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Zimji CPU Debugger")
+        self.cpu_data = Cpu()
+        self.decoder = Cli()
+
+        
+
+        # Create UI elements
+        self.create_widgets()
+
+    def create_widgets(self):
+        #CPU status frame
+        self.status_widget = Widget_CPU_Status(self.master)
+        self.status_widget.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+
+
+        # PC Label
+        #self.pc_label = tk.Label(self.status_frame, text="Program Counter: ")
+        #self.pc_label.grid(row=0, column=0, sticky="w")
+
+        # Instruction Label
+        #self.instr_label = tk.Label(self.status_frame, text="Instruction: ")
+        #self.instr_label.grid(row=1, column=0, sticky="w")
+
+        # Registers Frame
+        self.reg_frame = tk.Frame(self.master)
+        self.reg_frame.grid(row=0, column=1, sticky="w")
+        self.reg_labels = {}
+
+    def update_cpu_data(self, console_output):
+        pc, instr, registers = self.decoder.decode(console_output)
+        self.cpu_data.pc = pc
+        self.cpu_data.instruction = instr
+        self.cpu_data.registers = registers
+
+        # Update UI
+        #self.pc_label.config(text=f"Program Counter: {pc}")
+        #self.instr_label.config(text=f"Instruction: {instr}")
+
+        # Update Registers Display
+        for reg, val in registers.items():
+            if reg not in self.reg_labels:
+                label = tk.Label(self.reg_frame, text=f"{reg}: {val}")
+                label.pack(anchor="w")
+                self.reg_labels[reg] = label
+            else:
+                self.reg_labels[reg].config(text=f"{reg}: {val}")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ZimjiGUI(root)
+
+    # Example console output for testing
+
+
+    log_output = """PC:2 Instr: SEQ r2, 0, r31
+    r00=0x00000000  r01=0x00000000  r02=0x00000048  r03=0x00000000  r04=0x00000000  r05=0x00000000  r06=0x00000000  r07=0x00000000
+    r08=0x00000000  r09=0x00000000  r10=0x00000000  r11=0x00000000  r12=0x00000000  r13=0x00000000  r14=0x00000000  r15=0x00000000
+    r16=0x00000000  r17=0x00000000  r18=0x00000000  r19=0x00000000  r20=0x00000000  r21=0x00000000  r22=0x00000000  r23=0x00000000
+    r24=0x00000000  r25=0x00000000  r26=0x00000000  r27=0x00000000  r28=0x00000000  r29=0x00000000  r30=0x00000000  r31=0x00000000"""
+
+    app.update_cpu_data(log_output)
+    root.mainloop()
+#def decode_console_output(data):
+#    # 1. Extract PC (looking for 'PC:' followed by digits)
+#    pc_match = re.search(r"PC:(\d+)", data)
+#    pc_val = pc_match.group(1) if pc_match else "Not found"
+#
+#    # 2. Extract Instruction (everything after 'Instr:' until the end of that line)
+#    instr_match = re.search(r"Instr:\s*(.*)", data)
+#    instr_val = instr_match.group(1).strip() if instr_match else "Not found"
+#
+#    # 3. Extract Registers (matches 'rXX=0xXXXXXXXX')
+#    # findall returns a list of tuples like [('r00', '0x00000000'), ...]
+#    reg_matches = re.findall(r"(r\d{2})=(0x[0-9a-fA-F]+)", data)
+#    registers = {reg: val for reg, val in reg_matches}
+#
+#    return pc_val, instr_val, registers
+#
+## Execution
+#pc, instr, reg_dict = decode_console_output(log_output)
+#
+#print(f"--- Decoded Data ---")
+#print(f"Program Counter: {pc}")
+#print(f"Instruction:     {instr}")
+#print(f"Registers Found: {len(reg_dict)}")
+#print("-" * 20)
+#
+## Print a few registers to verify
+#for r in ["r00", "r02", "r31"]:
+#    print(f"{r}: {reg_dict.get(r, 'N/A')}")
