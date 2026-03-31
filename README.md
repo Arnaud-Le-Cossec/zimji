@@ -12,6 +12,24 @@ This repository contains:
 - [**Assembler**](ASSEMBLER/README.md)
 - [**Test programs**](TEST/README.md)
 
+## Main features
+
+### CPU
+
+- 32 bit Harvard architecture
+- Small instruction set: 34 instructions
+
+### SIMULATOR
+
+- Step mode / Free run with variable clock frequency
+- Simulated CPU cache
+- Live memory monitor/editor
+- Fast: over 4M instruction in less than 100 ms
+
+### ASSEMBLER
+
+- Implicit and explicit label definition
+
 ## Licence
 
 Copyright © 2026 Arnaud LE COSSEC
