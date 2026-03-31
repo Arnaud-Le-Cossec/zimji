@@ -174,7 +174,14 @@ int _cpu_op_scall (cpu_t* cpu_s, operand_t* operand_s){
         printf("[SCALL] R1 value (char): %c\n", (char)cpu_s->regs[1]);
         break;
     case 4:
-        printf("[SCALL] String at &R1: %s\n", &(cpu_s->data_mem[cpu_s->regs[1]]));
+        //printf("[SCALL] String at &R1: %s\n", &(cpu_s->data_mem[cpu_s->regs[1]])); // NOT WORKING
+        printf("[SCALL] String at &R1: ");
+        int i = 0;
+        while(cpu_s->data_mem[cpu_s->regs[1]+i] != 0){
+            printf("%c", (char)cpu_s->data_mem[cpu_s->regs[1]+i]);
+            i++;
+        }
+        printf("\n");
         break;
     default:
         printf("[SCALL] Unknown SCALL function\n");
