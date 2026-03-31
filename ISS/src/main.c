@@ -77,7 +77,7 @@ int main(int argc,char ** argv) {
     }
 
     /*Get the number of instructions in RAM file (if data file given)*/
-    if(argc = optind+2){  
+    if(argc == optind+2){  
         cpu_s.data_size = emu_pseudoBin_getSize(argv[optind+1]);
         if(cpu_s.prog_size == 0){
             fprintf(stderr, "Error reading binary RAM file\n");
@@ -103,7 +103,7 @@ int main(int argc,char ** argv) {
     printf("Loaded %zu lines from ROM file %s\n", emu_pseudoBin_load(argv[optind], cpu_s.prog_mem, cpu_s.prog_size), argv[optind]);
     
     /*Load data into memory*/
-    if(argc = optind+2){
+    if(argc == optind+2){
         printf("Loaded %zu lines from RAM file %s\n", emu_pseudoBin_load(argv[optind+1], cpu_s.data_mem, cpu_s.data_size), argv[optind]);
     }
 
