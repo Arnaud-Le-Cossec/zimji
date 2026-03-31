@@ -157,8 +157,9 @@ if __name__ == '__main__':
         asm_filename = sys.argv[1]
         bin_filename = sys.argv[2]
     except:
-        print("Could get arguments!")
-        print("USAGE: zimji_asm.py <ASM source> <BIN output>")
+        print("Could not get enough arguments!")
+        print("USAGE: zimji_asm <ASM source> <BIN output>")
+        exit(-1)
 
     lblmgr = LabelMgr(preload=registers)
     instrmgr = InstrMgr(label=lblmgr)
