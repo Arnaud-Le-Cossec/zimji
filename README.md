@@ -2,6 +2,8 @@
 
 "Simulateur de Jeu d'Instruction" (Instruction Set Simulator)
 
+Github: https://github.com/Arnaud-Le-Cossec/zimji
+
 ## About 
 
 This project is an academic project at ENSTA IP-Paris (Brest campus). The goal is to create an instruction set simulator (ISS) for a fictional CPU.
