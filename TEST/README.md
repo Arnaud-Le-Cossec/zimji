@@ -6,6 +6,7 @@ This folder contains projects to test the assembler, simulator and help you get 
 
 Each test will contain the following elements:
 
+- **README file**
 - **Assembly source code** `*.asm`
 - **Pre-compiled binary program** ([PseudoBin format](../ASSEMBLER/README.md#pseudobin-format)) `.bin`
 - **Pre-compiled binary data** ([PseudoBin format](../ASSEMBLER/README.md#pseudobin-format)) `data.bin` *(Optional)*
@@ -36,8 +37,11 @@ To know more, see the [assembler documentation](../ASSEMBLER/README.md)
 
 This repository contains: 
 
-- [**Memory test**](mem_test/mem.asm) Copies a string in memory from one address to another, then check data integrity.
+- [**Memory test**](mem_test/mem.asm) Copies a string in memory from one address to another, then check data integrity. *Excellent to test the cpu cache!*
 - [**Speed test**](speed_test/speed.asm) Run a big loop to test simulator speed
+- [**PGCD**](pgcd/README.md) Calculates the greatest common divider
+- [**Chenillard**](chenillard/README.md) Rotate a string in memory
+- [**Adventure**](adventure/README.md) Small text-based adventure game
 
 
 ## Licence
